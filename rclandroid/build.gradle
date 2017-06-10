@@ -1,0 +1,37 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenLocal()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.4.0-alpha7'
+        classpath "gradle.plugin.org.ros2.rcljava:rclJavaPlugin:0.4.9"
+    }
+}
+apply plugin: 'com.android.application'
+apply plugin: 'org.ros2.rcljava'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion '26.0.0 rc2'
+    lintOptions {
+        abortOnError false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        debug {
+            debuggable true
+            jniDebuggable true
+        }
+    }
+}
+
+dependencies {
+}
