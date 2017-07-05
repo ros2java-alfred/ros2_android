@@ -46,6 +46,10 @@ public abstract class BaseRosApplication extends Application {
         this.serviceConnection = new RosServiceConnection();
     }
 
+    public BaseRosService getRosService() {
+        return this.service;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -53,14 +57,13 @@ public abstract class BaseRosApplication extends Application {
     }
 
     protected void startNodeMainExecutorService() {
-        Log.d("RosApplication", "Start NodeMainExecutorService");
+        Log.d("RosApplication", "Start RosService");
         
         if (this.service == null) {
             Intent intent = new Intent(this, BaseRosService.class);
             this.startService(intent);
-            Preconditions.checkState(
-                    this.bindService(intent, this.serviceConnection, BIND_AUTO_CREATE),
-                    "Failed to bind NodeMainExecutorService.");
+            boolean isBinding = this.bindService(intent, this.serviceConnection, BIND_AUTO_CREATE);
+            Preconditions.checkState(isBinding, "Failed to bind RosService.");
         }
     }
 

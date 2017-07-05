@@ -14,29 +14,11 @@
  */
 package org.ros2.android.core.node;
 
-import android.content.Context;
-
-import org.ros2.rcljava.node.NativeNode;
+import org.ros2.rcljava.node.Node;
 
 /**
- * Android Native Node.
+ * Android Node.
  */
-public class AndroidNativeNode extends NativeNode implements AndroidNode {
-
-	private static final String TAG = "AndroidNativeNode";
-
-	private final Context context;
-
-	public AndroidNativeNode(String name, Context context) {
-		super(name);
-		this.context = context;
-	}
-
-	/**
-	 * Get ROS Node name.
-	 */
-	public String getDefaultNodeName() {
-		return "android_" + ""; //ApplicationBase.getUDID();
-	}
+public interface AndroidNode extends Node {
 
 }

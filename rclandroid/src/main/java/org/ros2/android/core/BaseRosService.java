@@ -20,7 +20,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.ros2.android.core.node.AndroidNativeNode;
+import org.ros2.android.core.node.AndroidNode;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.executor.MultiThreadedExecutor;
 
@@ -30,8 +30,8 @@ import java.util.List;
 /**
  * Ros2 on Service.
  */
-public abstract class BaseRosService extends Service {
-    static final String TAG = "NodeMainExecutorService";
+public class BaseRosService extends Service {
+    static final String TAG = "BaseRosService";
 
     /** Binder given to client. */
     private final IBinder mBinder = new RosBinder();
@@ -85,15 +85,15 @@ public abstract class BaseRosService extends Service {
         super.onDestroy();
     }
 
-    public void addNode(AndroidNativeNode node) {
+    public void addNode(AndroidNode node) {
         this.executor.addNode(node);
     }
 
-    public void removeNode(AndroidNativeNode node) {
+    public void removeNode(AndroidNode node) {
         this.executor.removeNode(node);
     }
 
-    public List<AndroidNativeNode> getNodes() {
+    public List<AndroidNode> getNodes() {
         return new ArrayList<>();
     }
 }
