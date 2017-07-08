@@ -19,27 +19,28 @@ import android.hardware.SensorEvent;
 
 import org.ros2.android.core.node.AndroidNode;
 
-import std_msgs.msg.Float32;
+import java.util.Arrays;
+import java.util.Collection;
 
-// import sensor_msgs.msg.Imu; //TODO To Enable
+import sensor_msgs.msg.Imu;
 
-public class GyroscopeSensorAdapter extends AbstractSensorAdapter<Float32> {
+public class GyroscopeSensorAdapter extends AbstractSensorAdapter<Imu> {
 
-//    private volatile Imu imu; //TODO To Enable
+    private volatile Imu imu = new Imu();
+    private long gyroTime;
 
-    public GyroscopeSensorAdapter(AndroidNode node, Float32 message, String topicName) {
+    public GyroscopeSensorAdapter(AndroidNode node, Imu message, String topicName) {
         super(node, message, topicName);
     }
 
     @Override
     public void publishSensorState() {
         synchronized (this.mutex) {
-            //TODO To Enable
-//            this.msg.setAngularVelocity(this.imu.getAngularVelocity());
-//            this.msg.setAngularVelocityCovariance(this.imu.getAngularVelocityCovariance);
+            this.msg.setAngularVelocity(this.imu.getAngularVelocity());
+            this.msg.setAngularVelocityCovariance(this.imu.getAngularVelocityCovariance());
 
-//            logger.debug("Publish Gyro value : " + this.lux);
-//            System.out.println("Publish Gyro value : " + this.lux);
+//            logger.debug("Publish gyro value : " + this.imu);
+//            System.out.println("Publish gyro value : " + this.imu);
         }
         this.pub.publish(this.msg);
     }
@@ -48,15 +49,16 @@ public class GyroscopeSensorAdapter extends AbstractSensorAdapter<Float32> {
     public void onSensorChanged(SensorEvent sensorEvent) {
         if(sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             synchronized (this.mutex) {
-                //TODO To Enable
-//                this.imu.getAngularVelocity().setX(sensorEvent.values[0]);
-//                this.imu.getAngularVelocity().setY(sensorEvent.values[1]);
-//                this.imu.getAngularVelocity().setZ(sensorEvent.values[2]);
-//                double[] tmpCov = {0.0025,0,0, 0,0.0025,0, 0,0,0.0025};// TODO Make Parameter
-//                this.imu.setAngularVelocityCovariance(tmpCov);
+                this.imu.getAngularVelocity().setX(sensorEvent.values[0]);
+                this.imu.getAngularVelocity().setY(sensorEvent.values[1]);
+                this.imu.getAngularVelocity().setZ(sensorEvent.values[2]);
 
-//                logger.debug("Sensor Gyro value : " + this.lux);
-//                System.out.println("Sensor Gyro value : " + this.lux);
+                Collection<Double> tmpCov = Arrays.asList(0.0025d,0d,0d, 0d,0.0025d,0d, 0d,0d,0.0025d);// TODO Make Parameter
+                this.imu.setAngularVelocityCovariance(tmpCov);
+                this.gyroTime = sensorEvent.timestamp;
+
+//                logger.debug("Sensor gyro value : " + this.imu);
+//                System.out.println("Sensor gyro value : " + this.imu);
             }
         }
     }

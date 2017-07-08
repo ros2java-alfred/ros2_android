@@ -19,28 +19,28 @@ import android.hardware.SensorEvent;
 
 import org.ros2.android.core.node.AndroidNode;
 
-import std_msgs.msg.Float32;
+import java.util.Arrays;
+import java.util.Collection;
 
-//import sensor_msgs.msg.Imu; //TODO To Enable
+import sensor_msgs.msg.Imu;
 
-public class AccelerometerSensorAdapter extends AbstractSensorAdapter<Float32> {
+public class AccelerometerSensorAdapter extends AbstractSensorAdapter<Imu> {
 
-    private volatile Float32 imu;
+    private volatile Imu imu = new Imu();
     private long accelTime;
 
-    public AccelerometerSensorAdapter(AndroidNode node, Float32 message, String topicName) {
+    public AccelerometerSensorAdapter(AndroidNode node, Imu message, String topicName) {
         super(node, message, topicName);
     }
 
     @Override
     public void publishSensorState() {
         synchronized (this.mutex) {
-            //TODO To Enable
-//            this.msg.setLinearAcceleration(this.imu.getLinearAcceleration());
-//            this.msg.setLinearAccelerationCovariance(this.imu.getLinearAccelerationCovariance());
+            this.msg.setLinearAcceleration(this.imu.getLinearAcceleration());
+            this.msg.setLinearAccelerationCovariance(this.imu.getLinearAccelerationCovariance());
 
-//            logger.debug("Publish Imu value : " + this.imu);
-//            System.out.println("Publish Imu value : " + this.imu);
+//            logger.debug("Publish gyro value : " + this.imu);
+//            System.out.println("Publish gyro value : " + this.imu);
         }
         this.pub.publish(this.msg);
     }
@@ -49,26 +49,16 @@ public class AccelerometerSensorAdapter extends AbstractSensorAdapter<Float32> {
     public void onSensorChanged(SensorEvent sensorEvent) {
         if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             synchronized (this.mutex) {
-                //TODO To Enable
-//                this.imu.getLinearAcceleration().setX(sensorEvent.values[0]);
-//                this.imu.getLinearAcceleration().setY(sensorEvent.values[1]);
-//                this.imu.getLinearAcceleration().setZ(sensorEvent.values[2]);
+                this.imu.getLinearAcceleration().setX(sensorEvent.values[0]);
+                this.imu.getLinearAcceleration().setY(sensorEvent.values[1]);
+                this.imu.getLinearAcceleration().setZ(sensorEvent.values[2]);
 
-//                Collection<Double> tmpCov = new ArrayList<>();
-//                tmpCov.add(0.01d);
-//                tmpCov.add(0d);
-//                tmpCov.add(0d);
-//                tmpCov.add(0d);
-//                tmpCov.add(0.01d);
-//                tmpCov.add(0d);
-//                tmpCov.add(0d);
-//                tmpCov.add(0d);
-//                tmpCov.add(0.01d);// TODO Make Parameter
-//                this.imu.setLinearAccelerationCovariance(tmpCov);
-//                this.accelTime = sensorEvent.timestamp;
+                Collection<Double> tmpCov = Arrays.asList(0.01d, 0d, 0d, 0d, 0.01d, 0d, 0d, 0d, 0.01d);// TODO Make Parameter
+                this.imu.setLinearAccelerationCovariance(tmpCov);
+                this.accelTime = sensorEvent.timestamp;
 
-//                logger.debug("Sensor Imu value : " + this.imu);
-//                System.out.println("Sensor Imu value : " + this.imu);
+//                logger.debug("Sensor gyro value : " + this.imu);
+//                System.out.println("Sensor gyro value : " + this.imu);
             }
         }
     }

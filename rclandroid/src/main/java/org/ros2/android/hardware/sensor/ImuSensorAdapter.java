@@ -20,30 +20,28 @@ import android.hardware.SensorEvent;
 import org.ros2.android.core.node.AndroidNode;
 import org.ros2.rcljava.node.topic.Publisher;
 
-import std_msgs.msg.Float32;
-
-//import sensor_msgs.msg.Imu; //TODO To Enable
+import sensor_msgs.msg.Imu;
 //import geometry_msgs.msg.Vector3; //TODO for test to FIX
 
-public class ImuSensorAdapter implements SensorAdapter<Float32> {
+public class ImuSensorAdapter implements SensorAdapter<Imu> {
 
     private boolean withSubTopics = true;
 
     protected AccelerometerSensorAdapter accelAdapter;
     protected GyroscopeSensorAdapter gyroAdapter;
 
-    protected Float32 msg;
+    protected Imu msg;
     protected String topicName = "_undefine!";//TODO TBD if keep
     protected final AndroidNode node;
-    protected final Publisher<Float32> pub;
+    protected final Publisher<Imu> pub;
 
-    public ImuSensorAdapter(AndroidNode node, Float32 imu, String topicName) {
+    public ImuSensorAdapter(AndroidNode node, Imu imu, String topicName) {
         this.topicName = topicName;
         this.node = node;
 
         this.msg = imu;
-        this.pub = this.node.<Float32>createPublisher(
-                (Class<Float32>)this.msg.getClass(),
+        this.pub = this.node.createPublisher(
+                Imu.class,
                 this.topicName);
 
         String accelTopic = null;
@@ -85,7 +83,7 @@ public class ImuSensorAdapter implements SensorAdapter<Float32> {
     }
 
     @Override
-    public Float32 getMessage() {
+    public Imu getMessage() {
         return this.msg;
     }
 }

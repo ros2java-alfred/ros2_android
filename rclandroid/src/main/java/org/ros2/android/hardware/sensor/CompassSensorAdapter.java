@@ -5,25 +5,28 @@ import android.hardware.SensorEvent;
 
 import org.ros2.android.core.node.AndroidNode;
 
-import std_msgs.msg.Float32;
+import java.util.Arrays;
+import java.util.Collection;
 
-//import sensor_msgs.msg.MagneticField; //TODO To Enable
+import sensor_msgs.msg.MagneticField;
 
-public class CompassSensorAdapter extends AbstractSensorAdapter<Float32> {
+public class CompassSensorAdapter extends AbstractSensorAdapter<MagneticField> {
 
+    private MagneticField magneticField = new MagneticField();
     private long magneTime;
 
-    public CompassSensorAdapter(AndroidNode node, Float32 message, String topicName) {
+    public CompassSensorAdapter(AndroidNode node, MagneticField message, String topicName) {
         super(node, message, topicName);
     }
 
     @Override
     public void publishSensorState() {
         synchronized (this.mutex) {
-            //TODO
+            this.msg.setMagneticField(this.magneticField.getMagneticField());
+            this.msg.setMagneticFieldCovariance(this.magneticField.getMagneticFieldCovariance());
 
-//            logger.debug("Publish Imu value : " + this.imu);
-//            System.out.println("Publish Imu value : " + this.imu);
+//            logger.debug("Publish compass value : " + this.magneticField);
+//            System.out.println("Publish compass value : " + this.magneticField);
         }
         this.pub.publish(this.msg);
     }
@@ -32,12 +35,16 @@ public class CompassSensorAdapter extends AbstractSensorAdapter<Float32> {
     public void onSensorChanged(SensorEvent sensorEvent) {
         if(sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             synchronized (this.mutex) {
-                //TODO
+                this.magneticField.getMagneticField().setX(sensorEvent.values[0]);
+                this.magneticField.getMagneticField().setY(sensorEvent.values[1]);
+                this.magneticField.getMagneticField().setZ(sensorEvent.values[2]);
 
+                Collection<Double> tmpCov = Arrays.asList(); //TODO
+                this.magneticField.setMagneticFieldCovariance(tmpCov);
                 this.magneTime = sensorEvent.timestamp;
 
-//                logger.debug("Sensor Imu value : " + this.imu);
-//                System.out.println("Sensor Imu value : " + this.imu);
+//                logger.debug("Sensor compass value : " + this.magneticField);
+//                System.out.println("Sensor compass value : " + this.magneticField);
             }
         }
     }

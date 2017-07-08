@@ -19,28 +19,28 @@ import android.hardware.SensorEvent;
 
 import org.ros2.android.core.node.AndroidNode;
 
-import std_msgs.msg.Float32;
+import java.util.Arrays;
+import java.util.Collection;
 
-// import sensor_msgs.msg.Imu; //TODO To Enable
+import sensor_msgs.msg.Imu;
 
-public class RotationVectorSensorAdapter extends AbstractSensorAdapter<Float32> {
+public class RotationVectorSensorAdapter extends AbstractSensorAdapter<Imu> {
 
-    //    private volatile Imu imu; //TODO To Enable
+    private volatile Imu imu = new Imu();
     private Object quatTime;
 
-    public RotationVectorSensorAdapter(AndroidNode node, Float32 message, String topicName) {
+    public RotationVectorSensorAdapter(AndroidNode node, Imu message, String topicName) {
         super(node, message, topicName);
     }
 
     @Override
     public void publishSensorState() {
         synchronized (this.mutex) {
-            //TODO To Enable
-//            this.msg.setOrientation(this.imu.getOrientation());
-//            this.msg.setOrientationCovariance(this.imu.getOrientationCovariance);
+            this.msg.setOrientation(this.imu.getOrientation());
+            this.msg.setOrientationCovariance(this.imu.getOrientationCovariance());
 
-//            logger.debug("Publish Gyro value : " + this.lux);
-//            System.out.println("Publish Gyro value : " + this.lux);
+//            logger.debug("Publish rotate value : " + this.imu);
+//            System.out.println("Publish rotate value : " + this.imu);
         }
         this.pub.publish(this.msg);
     }
@@ -49,19 +49,18 @@ public class RotationVectorSensorAdapter extends AbstractSensorAdapter<Float32> 
     public void onSensorChanged(SensorEvent sensorEvent) {
         if(sensorEvent.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             synchronized (this.mutex) {
-                //TODO To Enable
-//                float[] quaternion = new float[4];
+                float[] quaternion = new float[4];
 //                SensorManager.getQuaternionFromVector(quaternion, sensorEvent.values);
-//                this.imu.getOrientation().setW(quaternion[0]);
-//                this.imu.getOrientation().setX(quaternion[1]);
-//                this.imu.getOrientation().setY(quaternion[2]);
-//                this.imu.getOrientation().setZ(quaternion[3]);
-//                double[] tmpCov = {0.001,0,0, 0,0.001,0, 0,0,0.001};// TODO Make Parameter
-//                this.imu.setOrientationCovariance(tmpCov);
+                this.imu.getOrientation().setW(quaternion[0]);
+                this.imu.getOrientation().setX(quaternion[1]);
+                this.imu.getOrientation().setY(quaternion[2]);
+                this.imu.getOrientation().setZ(quaternion[3]);
+                Collection<Double> tmpCov = Arrays.asList(0.001d, 0d, 0d, 0d, 0.001d, 0d, 0d, 0d, 0.001d);// TODO Make Parameter
+                this.imu.setOrientationCovariance(tmpCov);
                 this.quatTime = sensorEvent.timestamp;
 
-//                logger.debug("Sensor Rotate value : " + this.lux);
-//                System.out.println("Sensor Rotate value : " + this.lux);
+//                logger.debug("Sensor rotate value : " + this.imu);
+//                System.out.println("Sensor rotate value : " + this.imu);
             }
         }
     }

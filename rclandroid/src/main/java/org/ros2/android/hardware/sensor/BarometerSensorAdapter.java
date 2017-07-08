@@ -19,20 +19,20 @@ import android.hardware.SensorEvent;
 
 import org.ros2.android.core.node.AndroidNode;
 
-import std_msgs.msg.Float32;
+import sensor_msgs.msg.FluidPressure;
 
-public class BarometerSensorAdapter extends AbstractSensorAdapter<Float32> {
+public class BarometerSensorAdapter extends AbstractSensorAdapter<FluidPressure> {
 
     private volatile float pressure = 0f;
 
-    public BarometerSensorAdapter(AndroidNode node, Float32 message, String topicName) {
+    public BarometerSensorAdapter(AndroidNode node, FluidPressure message, String topicName) {
         super(node, message, topicName);
     }
 
     @Override
     public void publishSensorState() {
         synchronized (this.mutex) {
-            this.msg.setData(this.pressure);
+            this.msg.setFluidPressure(this.pressure);
             logger.debug("Publish Barometer value : " + this.pressure);
             System.out.println("Publish Barometer value : " + this.pressure);
         }

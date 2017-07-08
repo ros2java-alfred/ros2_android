@@ -19,21 +19,20 @@ import android.hardware.SensorEvent;
 
 import org.ros2.android.core.node.AndroidNode;
 
-import std_msgs.msg.Float32;
-//import sensor_msgs.msg.Temperature; //TODO To Enable
+import sensor_msgs.msg.Temperature;
 
-public class AmbientTemperatureSensorAdapter extends AbstractSensorAdapter<Float32> {
+public class AmbientTemperatureSensorAdapter extends AbstractSensorAdapter<Temperature> {
 
     private volatile float temperature = 0f;
 
-    public AmbientTemperatureSensorAdapter(AndroidNode node, Float32 message, String topicName) {
+    public AmbientTemperatureSensorAdapter(AndroidNode node, Temperature message, String topicName) {
         super(node, message, topicName);
     }
 
     @Override
     public void publishSensorState() {
         synchronized (this.mutex) {
-            msg.setData(this.temperature);
+            msg.setTemperature(this.temperature);
             logger.debug("Publish ambient temperature value : " + this.temperature);
             System.out.println("Publish ambient temperature value : " + this.temperature);
         }
