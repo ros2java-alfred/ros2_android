@@ -52,6 +52,8 @@ public abstract class AbstractSensorNode<T extends Message> extends AndroidNativ
         this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         this.sensor = sensorManager.getDefaultSensor(this.typeSensor);
 
+        this.sensorManager.registerListener(this, this.sensor,
+                SensorManager.SENSOR_DELAY_NORMAL);
         this.timer = this.createWallTimer(time, timeUnit, this);
     }
 

@@ -25,22 +25,22 @@ public abstract class AbstractSensorAdapter<T extends Message> implements Sensor
     private static final String TAG = "LightSensorAdapter";
     protected static final Logger logger = LoggerFactory.getLogger(AbstractSensorAdapter.class);
 
-    protected String topicName = "_undefine!";
-    protected T msg;
+    protected volatile String topicName = "_undefine!";
+    protected final T msg;
     protected final AndroidNode node;
-    protected Publisher<T> pub;
+    protected volatile Publisher<T> pub;
 
     protected Object mutex = new Object();
 
-    public AbstractSensorAdapter(AndroidNode node, T message, String topicName) {
+    public AbstractSensorAdapter(final AndroidNode node, final T message, final String topicName) {
+        logger.debug("Init Sensor adapter");
+
         this.node = node;
+        this.msg = message;
         this.topicName = topicName;
 
-        this.msg = message;
         if (this.topicName != null) {
-            this.pub = this.node.<T>createPublisher(
-                    (Class<T>) this.msg.getClass(),
-                    this.topicName);
+            this.pub = this.node.createPublisher( (Class<T>)this.msg.getClass(), this.topicName);
         }
     }
 
@@ -49,7 +49,7 @@ public abstract class AbstractSensorAdapter<T extends Message> implements Sensor
     }
 
     @Override
-    public synchronized T getMessage() {
+    public T getMessage() {
         return this.msg;
     }
 }
