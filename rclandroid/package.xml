@@ -14,8 +14,10 @@
   <buildtool_depend>rosidl_generator_java</buildtool_depend>
 
   <build_depend>rcljava</build_depend>
+  <build_depend>sensor_msgs</build_depend>
 
   <exec_depend>rcljava</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
 
   <export>
     <build_type>ament_gradle</build_type>

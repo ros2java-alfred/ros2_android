@@ -1,3 +1,17 @@
+/* Copyright 2017 Mickael Gaillard <mick.gaillard@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ros2.android.core;
 
 import android.content.Context;
@@ -13,14 +27,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ros2.android.core.node.NodeAndroid;
+
+import org.ros2.android.core.mock.MockRosService;
+import org.ros2.android.core.node.AndroidNativeNode;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class NodeMainExecutorServiceTest {
+public class BaseRosServiceTest {
 
     private Context context;
 
@@ -34,22 +50,7 @@ public class NodeMainExecutorServiceTest {
 
     @After
     public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void onStartCommand() throws Exception {
-    }
-
-    @Test
-    public void onDestroy() throws Exception {
-    }
-
-    @Test
-    public void shutdown() throws Exception {
-    }
-
-    @Test
-    public void execute() throws Exception {
+        this.context = null;
     }
 
     @Test
@@ -57,25 +58,31 @@ public class NodeMainExecutorServiceTest {
     }
 
     @Test
-    public void testWithBoundService() throws TimeoutException {
+    public void testWithBoundService() throws TimeoutException, InterruptedException {
         // Create the service Intent.
-        Intent serviceIntent = new Intent(this.context, NodeMainExecutorService.class);
+        Intent serviceIntent = new Intent(this.context, MockRosService.class);
 
         // Data can be passed to the service via the Intent.
         //serviceIntent.putExtra(NodeMainExecutorService.SEED_KEY, 42L);
+        this.context.startService(serviceIntent);
 
         // Bind the service and grab a reference to the binder.
         IBinder binder = mServiceRule.bindService(serviceIntent);
 
         // Get the reference to the service, or you can call
         // public methods on the binder directly.
-        NodeMainExecutorService service =
-                ((NodeMainExecutorService.LocalBinder) binder).getService();
+        MockRosService serviceExecutor =
+                (MockRosService) ((MockRosService.RosBinder) binder).getService();
 
         // Verify that the service is working correctly.
-        NodeAndroid node = new NodeAndroid(this.context);
-        service.execute(node);
+        AndroidNativeNode node = new AndroidNativeNode("_test", this.context);
+        serviceExecutor.addNode(node);
         //assertThat(service.getRandomInt(), is(any(Integer.class)));
+
+        Thread.sleep(1000);
+
+        serviceExecutor.removeNode(node);
+        this.context.stopService(serviceIntent);
 
         int i = 0;
         i += 1;
