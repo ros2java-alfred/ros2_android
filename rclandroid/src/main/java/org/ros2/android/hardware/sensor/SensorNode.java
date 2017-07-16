@@ -15,14 +15,10 @@
 
 package org.ros2.android.hardware.sensor;
 
-import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 
-import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.time.WallTimerCallback;
 
-public interface SensorAdapter<T extends Message> {
-    void publishSensorState();
+public interface SensorNode extends WallTimerCallback, SensorEventListener {
 
-    void onSensorChanged(SensorEvent sensorEvent);
-
-    T getMessage();
 }

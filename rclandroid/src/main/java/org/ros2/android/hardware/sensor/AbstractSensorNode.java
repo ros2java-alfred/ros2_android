@@ -12,27 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.android.hardware.sensor;
 
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import org.ros2.android.core.node.AndroidNativeNode;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.time.WallTimer;
-import org.ros2.rcljava.time.WallTimerCallback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractSensorNode<T extends Message> extends AndroidNativeNode
-        implements WallTimerCallback, SensorEventListener {
+        implements SensorNode {
 
-    private final static String TAG = "LightSensorNode";
+    private final static String TAG = "AbstractSensorNode";
     private static final Logger logger = LoggerFactory.getLogger(AbstractSensorNode.class);
 
     private String topicName = "_undefine!";

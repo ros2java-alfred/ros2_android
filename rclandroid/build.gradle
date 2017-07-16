@@ -19,6 +19,7 @@ buildscript {
 //        classpath "org.ros2.rcljava:rclJavaPlugin:0.4.10"
     }
 }
+
 apply plugin: 'com.android.library'
 apply plugin: 'org.ros2.rcljava'
 
@@ -28,7 +29,7 @@ repositories {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '26.0.0 rc2'
+    buildToolsVersion '26.0.0'
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 25

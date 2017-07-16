@@ -23,7 +23,7 @@ import android.util.Log;
 
 import com.google.common.base.Preconditions;
 
-public abstract class BaseRosApplication extends Application {
+public class BaseRosApplication extends Application {
 
     private BaseRosService service;
 
