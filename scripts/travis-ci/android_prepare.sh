@@ -86,7 +86,7 @@ echo yyy | sdkmanager --update
 ARRAY=$(echo $ANDROID_PACKAGES | tr ":" "\n")
 for package in $ARRAY
 do
-  echo "\t- install $package" && echo y | sdkmanager "$package"
+  echo -e "\t- install $package" && echo y | sdkmanager "$package"
 done
 
 if [ $DEBUG -eq 1 ]
