@@ -5,15 +5,6 @@ sudo: required
 
 language: generic
 
-#language: android
-#jdk: oraclejdk8
-
-#android:
-#  components:
-#    - platform-tools
-#    - tools
-#    - sys-img-armeabi-v7a-android-25
-
 services:
   - docker
 
