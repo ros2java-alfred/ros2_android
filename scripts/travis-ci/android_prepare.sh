@@ -86,7 +86,7 @@ echo yyy | sdkmanager --update
 ARRAY=$(echo $ANDROID_PACKAGES | tr ":" "\n")
 for package in $ARRAY
 do
-  echo "\t- install $package" && echo y | sdkmanager "$package"
+  echo -e "\t- install $package" && echo y | sdkmanager "$package"
 done
 
 if [ $DEBUG -eq 1 ]
@@ -114,7 +114,7 @@ echo "Patch for Java support."
 cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_android.diff
 
 # Sync with git trigger
-rm -rf $ROS2WS/src/ros2_java/ros2_android_examples && ln -s $HOME_BUILD/ros2java-alfred/ros2_android_examples $ROS2WS/src/ros2_java/ros2_android_examples
+rm -rf $ROS2WS/src/ros2_java/ros2_android && ln -s $HOME_BUILD/ros2java-alfred/ros2_android $ROS2WS/src/ros2_java/ros2_android
 
 # Disable many package (not needed for android)
 echo "Disable packages."
@@ -146,7 +146,7 @@ fi
 rm -rf $HOME_BUILD/ros2_java_ws/build_isolated
 echo no | avdmanager create avd --force -n test --tag default --abi armeabi-v7a -k "system-images;android-21;default;armeabi-v7a"
 emulator -avd test -no-audio -no-window &
-$HOME_BUILD/ros2_java_ws/src/ros2_java/ros2_android/rclandroid/scripts/travis-ci/android_wait_for_emulator.sh
+$HOME_BUILD/ros2java-alfred/ros2_android/scripts/travis-ci/android_wait_for_emulator.sh
 adb shell input keyevent 82 &
   
 exit
