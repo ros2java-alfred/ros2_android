@@ -143,11 +143,14 @@ then
   df -h
 fi
 
+echo -e "\n\e[33;1mClean ROS2 build WS...\e[0m"
 rm -rf $HOME_BUILD/ros2_java_ws/build_isolated
-echo no | avdmanager create avd --force -n test --tag default --abi armeabi-v7a -k "system-images;android-21;default;armeabi-v7a"
+
+echo -e "\n\e[33;1mStart Emulator...\e[0m"
+echo no | avdmanager create avd --force -n test --tag default --abi $ANDROID_ABI -k "system-images;$ANDROID_VER;default;$ANDROID_ABI"
 emulator -avd test -no-audio -no-window &
 $HOME_BUILD/ros2java-alfred/ros2_android/scripts/travis-ci/android_wait_for_emulator.sh
 adb shell input keyevent 82 &
-  
+
 exit
 
