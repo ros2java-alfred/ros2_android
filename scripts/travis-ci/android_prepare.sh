@@ -103,7 +103,7 @@ docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated"
 
 # INSTALL ROS2 WS...
-echo -e "\e[33;1mINSTALL ROS2 WS...\e[0m"
+echo -e "\n\e[33;1mINSTALL ROS2 WS...\e[0m"
 mkdir -p $ROS2WS/src
 cd $ROS2WS
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/617cd893813163cdcb9943a08d667964/raw/ros2_java_android.repos -nv"
@@ -120,6 +120,12 @@ rm -rf $ROS2WS/src/ros2_java/ros2_android && ln -s $HOME_BUILD/ros2java-alfred/r
 echo "Disable packages."
 touch $ROS2WS/src/ros2/rosidl/python_cmake_module/AMENT_IGNORE
 touch $ROS2WS/src/ros2/rosidl/rosidl_generator_py/AMENT_IGNORE
+touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_android_listener/AMENT_IGNORE
+touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_android_talker/AMENT_IGNORE
+touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_listener_android/AMENT_IGNORE
+touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_talker_android/AMENT_IGNORE
+# touch $ROS2WS/src/ros2_java/ros2_android_tango_examples/
+
 
 # DEBUG
 if [ $DEBUG -eq 1 ]
