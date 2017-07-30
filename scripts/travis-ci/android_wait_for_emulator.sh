@@ -8,7 +8,12 @@ bootanim=""
 failcounter=0
 until [[ "$bootanim" =~ "stopped" ]]; do
    bootanim=`adb -e shell getprop init.svc.bootanim 2>&1`
-   echo "$bootanim"
+   
+   if [[ "$bootanim" =~ "running"]]; then
+      printf "."
+   else
+      echo "$bootanim"
+   fi
    if [[ "$bootanim" =~ "not found" ]]; then
       let "failcounter += 1"
       if [[ $failcounter -gt 15 ]]; then
