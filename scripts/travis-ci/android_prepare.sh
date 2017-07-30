@@ -4,6 +4,8 @@
 set -e
 
 DEBUG=0
+EMULATOR=0
+
 if [ $DEBUG -eq 1 ]
 then
   set -ev
@@ -114,12 +116,18 @@ echo "Patch for Java support."
 cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_android.diff
 
 # Sync with git trigger
-rm -rf $ROS2WS/src/ros2_java/ros2_android_examples && ln -s $HOME_BUILD/ros2java-alfred/ros2_android_examples $ROS2WS/src/ros2_java/ros2_android_examples
+rm -rf $ROS2WS/src/ros2_java/ros2_android && ln -s $HOME_BUILD/ros2java-alfred/ros2_android $ROS2WS/src/ros2_java/ros2_android
 
 # Disable many package (not needed for android)
 echo "Disable packages."
 touch $ROS2WS/src/ros2/rosidl/python_cmake_module/AMENT_IGNORE
 touch $ROS2WS/src/ros2/rosidl/rosidl_generator_py/AMENT_IGNORE
+touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_android_listener/AMENT_IGNORE
+touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_android_talker/AMENT_IGNORE
+touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_listener_android/AMENT_IGNORE
+touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_talker_android/AMENT_IGNORE
+# touch $ROS2WS/src/ros2_java/ros2_android_tango_examples/
+
 
 # DEBUG
 if [ $DEBUG -eq 1 ]
@@ -135,12 +143,24 @@ fi
 
 echo -e "\n\e[33;1mBUILD ROS2 WS...\e[0m"
 cd $HOME_BUILD
-docker run -u "$UID" -it --rm -v $(pwd):$(pwd) --env-file "$HOME_ENV" -w $(pwd) "$DOCKER_IMG" sh -c ". $HOME_BUILD/ament_ws/install_isolated/local_setup.sh && cd $ROS2WS && ament build --symlink-install --isolated --cmake-args -DPYTHON_EXECUTABLE=\"$PYTHON_PATH\" -DTHIRDPARTY=ON -DCMAKE_FIND_ROOT_PATH=\"$ROOT_PATH\" -DANDROID_FUNCTION_LEVEL_LINKING=OFF -DANDROID_TOOLCHAIN_NAME=\"$ANDROID_GCC\" -DANDROID_STL=gnustl_shared -DANDROID_ABI=\"$ANDROID_ABI\" -DANDROID_NDK=\"$ANDROID_NDK_HOME\" -DANDROID_NATIVE_API_LEVEL=\"$ANDROID_VER\" -DCMAKE_TOOLCHAIN_FILE=\"$ROS2JAVA_PATH\" -DANDROID_HOME=\"$ANDROID_SDK_ROOT\" -- --ament-gradle-args -g $HOME_BUILD/.gradle -Pament.android_stl=gnustl_shared -Pament.android_abi=\"$ANDROID_ABI\" -Pament.android_ndk=\"$ANDROID_NDK_HOME\" --stacktrace -- "
+docker run -u "$UID" -it --rm -v $(pwd):$(pwd) --env-file "$HOME_ENV" -w $(pwd) "$DOCKER_IMG" sh -c ". $HOME_BUILD/ament_ws/install_isolated/local_setup.sh && cd $ROS2WS && ament build --isolated --cmake-args -DPYTHON_EXECUTABLE=\"$PYTHON_PATH\" -DTHIRDPARTY=ON -DCMAKE_FIND_ROOT_PATH=\"$ROOT_PATH\" -DANDROID_FUNCTION_LEVEL_LINKING=OFF -DANDROID_TOOLCHAIN_NAME=\"$ANDROID_GCC\" -DANDROID_STL=gnustl_shared -DANDROID_ABI=\"$ANDROID_ABI\" -DANDROID_NDK=\"$ANDROID_NDK_HOME\" -DANDROID_NATIVE_API_LEVEL=\"$ANDROID_VER\" -DCMAKE_TOOLCHAIN_FILE=\"$ROS2JAVA_PATH\" -DANDROID_HOME=\"$ANDROID_SDK_ROOT\" -- --ament-gradle-args -g $HOME_BUILD/.gradle -Pament.android_stl=gnustl_shared -Pament.android_abi=\"$ANDROID_ABI\" -Pament.android_ndk=\"$ANDROID_NDK_HOME\" --stacktrace -- "
 
 # DEBUG
 if [ $DEBUG -eq 1 ]
 then
   df -h
+fi
+
+echo -e "\n\e[33;1mClean ROS2 build WS...\e[0m"
+rm -rf $HOME_BUILD/ros2_java_ws/build_isolated
+
+if [ $EMULATOR -eq 1 ]
+then
+  echo -e "\n\e[33;1mStart Emulator...\e[0m"
+  echo no | avdmanager create avd --force -n test --tag default --abi $ANDROID_ABI -k "system-images;$ANDROID_VER;default;$ANDROID_ABI"
+  emulator -avd test -no-audio -no-window &
+  $HOME_BUILD/ros2java-alfred/ros2_android/scripts/travis-ci/android_wait_for_emulator.sh
+  adb shell input keyevent 82 &
 fi
 
 exit
