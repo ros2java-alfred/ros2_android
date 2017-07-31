@@ -3,12 +3,23 @@
 
 set -e
 
-DEBUG=0
+DEBUG=1
 EMULATOR=0
+
+displayDebug() {
+  if [ $DEBUG -eq 1 ]
+  then
+    echo "List files"
+    ls -lFa ./
+    echo "Disk space usage."
+    df -h
+  fi
+}
 
 if [ $DEBUG -eq 1 ]
 then
   set -ev
+  df -h
 fi
 
 DOCKER_IMG="$DOCKER_REPO:$DOCKER_DIST"
@@ -17,6 +28,8 @@ DOCKER_IMG="$DOCKER_REPO:$DOCKER_DIST"
 echo -e "\n\e[33;1mDocker Hub..\e[0m"
 docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 docker pull $DOCKER_IMG
+
+displayDebug
 
 # Make shared environment variables.
 echo -e "\n\e[33;1mMake shared environment variables.\e[0m"
@@ -32,21 +45,17 @@ echo -e "PYTHON_PATH=$PYTHON_PATH\nROOT_PATH=$ROOT_PATH" >> $HOME_ENV
 # Check container variables.
 if [ $DEBUG -eq 1 ]
 then
-echo -e "\n\e[33;1mCheck container variables.\e[0m"
-docker run -u "$UID" -it --rm -v $(pwd):$(pwd) --env-file $HOME_ENV -w $(pwd) $DOCKER_IMG sh -c "locale && env | grep -E '^TRAVIS_' && env | grep -E '^CI_' && env | grep -E '^ROS' && env | grep -E '^ANDROID' && df -h"
+  echo -e "\n\e[33;1mCheck container variables.\e[0m"
+  docker run -u "$UID" -it --rm -v $(pwd):$(pwd) --env-file $HOME_ENV -w $(pwd) $DOCKER_IMG sh -c "locale && env | grep -E '^TRAVIS_' && env | grep -E '^CI_' && env | grep -E '^ROS' && env | grep -E '^ANDROID' && df -h"
+  displayDebug
 fi
 
 # Install NDK.
 if [ ! -d "$ANDROID_NDK_HOME/platforms" ]; then
-    echo -e "\n\e[33;1mInstall ANDROID NDK...\e[0m"
-    cd $HOME_BUILD
-    echo "Download..." && wget https://dl.google.com/android/repository/$ANDROID_NDK_VER-linux-x86_64.zip -nv && echo "Unzip it..." && unzip -q -o $ANDROID_NDK_VER-linux-x86_64.zip -d ./ && echo "Remove zip file." && rm -f $ANDROID_NDK_VER-linux-x86_64.zip
-fi
-
-if [ $DEBUG -eq 1 ]
-then
-  ls -lFa ./
-  df -h
+  echo -e "\n\e[33;1mInstall ANDROID NDK...\e[0m"
+  cd $HOME_BUILD
+  echo "Download..." && wget https://dl.google.com/android/repository/$ANDROID_NDK_VER-linux-x86_64.zip -nv && echo "Unzip it..." && unzip -q -o $ANDROID_NDK_VER-linux-x86_64.zip -d ./ && echo "Remove zip file." && rm -f $ANDROID_NDK_VER-linux-x86_64.zip
+  displayDebug
 fi
 
 # Install SDK.
@@ -55,12 +64,7 @@ then
   echo -e "\n\e[33;1mInstall ANDROID SDK...\e[0m"
   cd $HOME_BUILD
   echo "Download SDK..." && wget https://dl.google.com/android/repository/$ANDROID_SDK_VER.zip -nv && echo "Unzip it..." && unzip -q -o $ANDROID_SDK_VER.zip -d $ANDROID_SDK_VER && echo "Remove zip file." && rm -f $ANDROID_SDK_VER.zip
-fi
-
-if [ $DEBUG -eq 1 ]
-then
-  ls -lFa ./
-  df -h
+  displayDebug
 fi
 
 # Add licenses SDK.
@@ -90,11 +94,7 @@ for package in $ARRAY
 do
   echo -e "\t- install $package" && echo y | sdkmanager "$package"
 done
-
-if [ $DEBUG -eq 1 ]
-then
-  df -h
-fi
+displayDebug
 
 # INSTALL/BUILD ROS2 AMENT...
 echo -e "\n\e[33;1mINSTALL/BUILD ROS2 AMENT...\e[0m"
@@ -103,6 +103,7 @@ cd $HOME_BUILD/ament_ws
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos -nv"
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/vcs import src < ament_java.repos"
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated"
+displayDebug
 
 # INSTALL ROS2 WS...
 echo -e "\n\e[33;1mINSTALL ROS2 WS...\e[0m"
@@ -110,6 +111,7 @@ mkdir -p $ROS2WS/src
 cd $ROS2WS
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/617cd893813163cdcb9943a08d667964/raw/ros2_java_android.repos -nv"
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/vcs import src < ros2_java_android.repos"
+displayDebug
 
 # Patch for Java support.
 echo "Patch for Java support."
@@ -138,18 +140,13 @@ then
   echo "List $ROS2WS/src path"
   cd $ROS2WS/src
   find . -maxdepth 3 -type d -not \( -path "./.git" -prune \)
-  df -h
+  displayDebug
 fi
 
 echo -e "\n\e[33;1mBUILD ROS2 WS...\e[0m"
 cd $HOME_BUILD
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) --env-file "$HOME_ENV" -w $(pwd) "$DOCKER_IMG" sh -c ". $HOME_BUILD/ament_ws/install_isolated/local_setup.sh && cd $ROS2WS && ament build --isolated --cmake-args -DPYTHON_EXECUTABLE=\"$PYTHON_PATH\" -DTHIRDPARTY=ON -DCMAKE_FIND_ROOT_PATH=\"$ROOT_PATH\" -DANDROID_FUNCTION_LEVEL_LINKING=OFF -DANDROID_TOOLCHAIN_NAME=\"$ANDROID_GCC\" -DANDROID_STL=gnustl_shared -DANDROID_ABI=\"$ANDROID_ABI\" -DANDROID_NDK=\"$ANDROID_NDK_HOME\" -DANDROID_NATIVE_API_LEVEL=\"$ANDROID_VER\" -DCMAKE_TOOLCHAIN_FILE=\"$ROS2JAVA_PATH\" -DANDROID_HOME=\"$ANDROID_SDK_ROOT\" -- --ament-gradle-args -g $HOME_BUILD/.gradle -Pament.android_stl=gnustl_shared -Pament.android_abi=\"$ANDROID_ABI\" -Pament.android_ndk=\"$ANDROID_NDK_HOME\" --stacktrace -- "
-
-# DEBUG
-if [ $DEBUG -eq 1 ]
-then
-  df -h
-fi
+displayDebug
 
 echo -e "\n\e[33;1mClean ROS2 build WS...\e[0m"
 rm -rf $HOME_BUILD/ros2_java_ws/build_isolated
@@ -161,6 +158,7 @@ then
   emulator -avd test -no-audio -no-window &
   $HOME_BUILD/ros2java-alfred/ros2_android/scripts/travis-ci/android_wait_for_emulator.sh
   adb shell input keyevent 82 &
+  displayDebug
 fi
 
 exit
