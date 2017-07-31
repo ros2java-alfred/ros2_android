@@ -3,7 +3,16 @@
 
 sudo: required
 
-language: generic
+#language: generic
+language: android
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-26.0.1
+    - android-21
+    - extra-google-m2repository
+    - extra-android-m2repository
 
 services:
   - docker
