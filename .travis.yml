@@ -3,7 +3,11 @@
 
 sudo: required
 
-language: generic
+language: android
+android:
+  components:
+    - tools
+    - platform-tools
 
 services:
   - docker
