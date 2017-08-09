@@ -34,18 +34,19 @@ displayDebug
 # Make shared environment variables.
 echo -e "\n\e[33;1mMake shared environment variables.\e[0m"
 cd $HOME_BUILD
-env | grep -E '^TRAVIS_' > $HOME_ENV && \
-env | grep -E '^ANDROID_' >> $HOME_ENV && \
-env | grep -E '^ROS' >> $HOME_ENV && \
-env | grep -E '^COVERALLS_' >> $HOME_ENV && \
-env | grep -E '^CI_' >> $HOME_ENV && \
-echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH" >> $HOME_ENV && \
+env | grep -E '^TRAVIS_' > $HOME_ENV
+env | grep -E '^ANDROID_' >> $HOME_ENV
+env | grep -E '^ROS' >> $HOME_ENV
+#env | grep -E '^COVERALLS_' >> $HOME_ENV
+env | grep -E '^CI_' >> $HOME_ENV
+echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH" >> $HOME_ENV
 echo -e "PYTHON_PATH=$PYTHON_PATH\nROOT_PATH=$ROOT_PATH" >> $HOME_ENV
 
 # Check container variables.
 if [ $DEBUG -eq 1 ]
 then
   echo -e "\n\e[33;1mCheck container variables.\e[0m"
+  cat $HOME_ENV
   docker run -u "$UID" -it --rm -v $(pwd):$(pwd) --env-file $HOME_ENV -w $(pwd) $DOCKER_IMG sh -c "locale && env | grep -E '^TRAVIS_' && env | grep -E '^CI_' && env | grep -E '^ROS' && env | grep -E '^ANDROID' && df -h"
   displayDebug
 fi
