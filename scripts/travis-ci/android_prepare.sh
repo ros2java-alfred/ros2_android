@@ -125,6 +125,9 @@ rm -rf $ROS2WS/src/ros2_java/ros2_android && ln -s $HOME_BUILD/ros2java-alfred/r
 echo "Disable packages."
 touch $ROS2WS/src/ros2/rosidl/python_cmake_module/AMENT_IGNORE
 touch $ROS2WS/src/ros2/rosidl/rosidl_generator_py/AMENT_IGNORE
+#touch $ROS2WS/src/ros2/rosidl/rosidl_generator_cpp/AMENT_IGNORE
+#touch $ROS2WS/src/ros2/rosidl/rosidl_typesupport_introspection_cpp/AMENT_IGNORE
+#touch $ROS2WS/src/ros2/rosidl_typesupport/rosidl_typesupport_cpp/AMENT_IGNORE
 touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_android_listener/AMENT_IGNORE
 touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_android_talker/AMENT_IGNORE
 touch $ROS2WS/src/ros2_java/ros2_android_examples/ros2_listener_android/AMENT_IGNORE
