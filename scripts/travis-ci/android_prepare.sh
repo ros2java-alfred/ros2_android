@@ -56,6 +56,7 @@ if [ ! -d "$ANDROID_NDK_HOME/platforms" ]; then
   echo -e "\n\e[33;1mInstall ANDROID NDK...\e[0m"
   cd $HOME_BUILD
   echo "Download..." && wget https://dl.google.com/android/repository/$ANDROID_NDK_VER-linux-x86_64.zip -nv && echo "Unzip it..." && unzip -q -o $ANDROID_NDK_VER-linux-x86_64.zip -d ./ && echo "Remove zip file." && rm -f $ANDROID_NDK_VER-linux-x86_64.zip
+  cp -rf $HOME_BUILD/ros2java-alfred/ros2_android/scripts/android.toolchain.cmake $ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
   displayDebug
 fi
 
@@ -101,7 +102,7 @@ displayDebug
 echo -e "\n\e[33;1mINSTALL/BUILD ROS2 AMENT...\e[0m"
 mkdir -p $HOME_BUILD/ament_ws/src
 cd $HOME_BUILD/ament_ws
-docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos -nv && apt-get install -q -y libc6-dev"
+docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos -nv"
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/vcs import src < ament_java.repos"
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated"
 displayDebug
