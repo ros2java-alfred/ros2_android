@@ -1,0 +1,121 @@
+#!/bin/sh
+
+set -e
+
+## Variables
+declare -r DEBUG=1
+declare -r EMULATOR=0
+
+##################################################################
+# Display debug symbol
+##################################################################
+function display_debug() {
+  if [ $DEBUG -eq 1 ]
+  then
+    echo "List files"
+    ls -lFa ./
+    echo "Disk space usage."
+    df -h
+  fi
+}
+
+##################################################################
+#
+##################################################################
+function get_docker_image() {
+  echo -e "\n\e[33;1mDocker Hub..\e[0m"
+  docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  docker pull $DOCKER_IMG
+}
+
+##################################################################
+# Make shared environment variables.
+##################################################################
+function make_environement_file() {
+  echo -e "\n\e[33;1mMake shared environment variables.\e[0m"
+  cd $HOME_BUILD
+  env | grep -E '^TRAVIS_' > $HOME_ENV
+  env | grep -E '^ANDROID_' >> $HOME_ENV
+  env | grep -E '^ROS' >> $HOME_ENV
+#  env | grep -E '^COVERALLS_' >> $HOME_ENV
+  env | grep -E '^CI_' >> $HOME_ENV
+  echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH" >> $HOME_ENV
+  echo -e "PYTHON_PATH=$PYTHON_PATH\nROOT_PATH=$ROOT_PATH" >> $HOME_ENV
+}
+
+##################################################################
+# Install SDK.
+##################################################################
+function get_sdk_android() {
+  if [ ! -d "$ANDROID_SDK_ROOT/tools" ]; then
+    echo -e "\n\e[33;1mInstall ANDROID SDK...\e[0m"
+    cd $HOME_BUILD
+    echo "Download SDK..." && wget https://dl.google.com/android/repository/$ANDROID_SDK_VER.zip -nv && echo "Unzip it..." && unzip -q -o $ANDROID_SDK_VER.zip -d $ANDROID_SDK_VER && echo "Remove zip file." && rm -f $ANDROID_SDK_VER.zip
+    display_debug
+  fi
+}
+
+##################################################################
+# Install NDK.
+##################################################################
+function get_ndk_android() {
+  if [ ! -d "$ANDROID_NDK_HOME/platforms" ]; then
+    echo -e "\n\e[33;1mInstall ANDROID NDK...\e[0m"
+    cd $HOME_BUILD
+    echo "Download..." && wget https://dl.google.com/android/repository/$ANDROID_NDK_VER-linux-x86_64.zip -nv && echo "Unzip it..." && unzip -q -o $ANDROID_NDK_VER-linux-x86_64.zip -d ./ && echo "Remove zip file." && rm -f $ANDROID_NDK_VER-linux-x86_64.zip
+    cp -rf $HOME_BUILD/ros2java-alfred/ros2_android/scripts/android.toolchain.cmake $ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
+    display_debug
+  fi
+}
+
+##################################################################
+# Add licenses SDK.
+##################################################################
+function set_licenses_android() {
+  if [ ! -d "$ANDROID_SDK_ROOT/licenses" ]; then
+    echo "Add licenses SDK..."
+    mkdir -p $ANDROID_SDK_ROOT/licenses
+    echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
+    echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_SDK_ROOT/licenses/android-sdk-preview-license"
+    echo -e "\n152e8995e4332c0dc80bc63bf01fe3bbccb0804a\nd975f751698a77b662f1254ddbeed3901e976f5a" > "$ANDROID_SDK_ROOT/licenses/intel-android-extra-license"
+  fi
+}
+
+##################################################################
+# Add repositories SDK.
+##################################################################
+function set_repositories_android() {
+  if [ ! -f "$ANDROID_SDK_HOME/repositories.cfg" ]; then
+    echo "Add repositories SDK..."
+    mkdir -p $ANDROID_SDK_HOME
+    echo "### User Sources for Android SDK Manager" >> $ANDROID_SDK_HOME/repositories.cfg
+    echo "count=0" >> $ANDROID_SDK_HOME/repositories.cfg
+  fi
+}
+
+##################################################################
+# Install SDK components.
+##################################################################
+function get_sdk_components() {
+  echo "Install SDK components..."
+  echo yyy | sdkmanager --update
+  ARRAY=$(echo $ANDROID_PACKAGES | tr ":" "\n")
+  for package in $ARRAY; do
+    echo -e "\t- install $package" && echo y | sdkmanager "$package"
+  done
+}
+
+##################################################################
+# Start android emulator.
+##################################################################
+function start_emulator_android() {
+  if [ $EMULATOR -eq 1 ]; then
+    echo -e "\n\e[33;1mStart Emulator...\e[0m"
+    echo no | avdmanager create avd --force -n test --tag default --abi $ANDROID_ABI -k "system-images;$ANDROID_VER;default;$ANDROID_ABI"
+    emulator -avd test -no-audio -no-window &
+    $HOME_BUILD/ros2java-alfred/ros2_android/scripts/travis-ci/android_wait_for_emulator.sh
+    adb shell input keyevent 82 &
+    
+    display_debug
+  fi
+}

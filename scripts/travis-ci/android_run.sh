@@ -3,8 +3,7 @@
 
 set -e
 
-DEBUG=0
-EMULATOR=0
+source android_common.source
 
 if [ $DEBUG -eq 1 ]
 then
