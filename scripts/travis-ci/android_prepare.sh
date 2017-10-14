@@ -3,7 +3,8 @@
 
 set -e
 
-source android_common.source
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$DIR/android_common.source"
 
 if [ $DEBUG -eq 1 ]
 then
