@@ -99,7 +99,7 @@ function set_repositories_android() {
 function get_sdk_components() {
   echo "Install SDK components..."
   echo yyy | sdkmanager --update
-  yes |sdkmanager --licenses
+#  yes |sdkmanager --licenses
   ARRAY=$(echo $ANDROID_PACKAGES | tr ":" "\n")
   for package in $ARRAY; do
     echo -e "\t- install $package" && echo y | sdkmanager "$package"
