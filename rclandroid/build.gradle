@@ -10,14 +10,14 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
         jcenter()
-//        mavenLocal()
+        mavenLocal()
         google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-beta6'
         classpath "gradle.plugin.org.ros2.rcljava:rclJavaPlugin:0.5.0"
 //        classpath "org.ros2.rcljava:rclJavaPlugin:0.5.0"
+        classpath 'com.android.tools.build:gradle:3.0.0-beta7'
     }
 }
 
@@ -36,6 +36,9 @@ android {
         minSdkVersion 14
         targetSdkVersion 26
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a"
+        }
     }
     lintOptions {
         abortOnError false
@@ -53,8 +56,10 @@ android {
 dependencies {
     implementation 'com.google.guava:guava:11.0'
     implementation 'com.android.support:support-core-utils:26.1.0'
+
     // Required for local unit tests (JUnit 4 framework)
     testImplementation 'junit:junit:4.12'
+
     // Required for instrumented tests
     androidTestImplementation 'com.android.support:support-annotations:26.1.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
