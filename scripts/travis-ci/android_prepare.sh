@@ -3,7 +3,7 @@
 
 set -e
 
-source android_common.source
+source ~/ros2_android/scripts/travis-ci/android_common.source
 
 if [ $DEBUG -eq 1 ]
 then
