@@ -75,7 +75,7 @@ function set_licenses_android() {
   if [ ! -d "$ANDROID_SDK_ROOT/licenses" ]; then
     echo "Add licenses SDK..."
     mkdir -p $ANDROID_SDK_ROOT/licenses
-    echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
+    echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
     echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_SDK_ROOT/licenses/android-sdk-preview-license"
     echo -e "\n152e8995e4332c0dc80bc63bf01fe3bbccb0804a\nd975f751698a77b662f1254ddbeed3901e976f5a" > "$ANDROID_SDK_ROOT/licenses/intel-android-extra-license"
   fi
