@@ -68,8 +68,4 @@ dependencies {
 
     // Set this dependency to use JUnit 4 rules
     androidTestCompile lib.android.test.rules
-    // Set this dependency to build and run Espresso tests
-//    androidTestCompile lib.android.test.espressoCore
-    // Set this dependency to build and run UI Automator tests
-//    androidTestCompile lib.android.test.uiAutomation
 }

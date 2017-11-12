@@ -17,7 +17,11 @@ package org.ros2.android.core;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import org.ros2.android.core.node.AndroidNode;
@@ -30,8 +34,8 @@ import java.util.List;
 /**
  * Ros2 on Service.
  */
-public class BaseRosService extends Service {
-    static final String TAG = "BaseRosService";
+public class RosService extends Service {
+    static final String TAG = "RosService";
 
     /** Binder given to client. */
     private final IBinder mBinder = new RosBinder();
@@ -39,50 +43,88 @@ public class BaseRosService extends Service {
     /** Service Executor */
     private MultiThreadedExecutor executor;
 
+    private volatile HandlerThread handlerThread;
+    private ServiceHandler serviceHandler;
+
     protected class RosBinder extends Binder {
-        public BaseRosService getService() {
-            return BaseRosService.this;
+        public RosService getService() {
+            return RosService.this;
         }
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStart");
-        int result = super.onStartCommand(intent, flags, startId);
+    public void onCreate() {
+        super.onCreate();
+
+        Log.d(TAG, "Start RosService");
+
+        // An Android handler thread internally operates on a looper.
+        this.handlerThread = new HandlerThread("Service Main Thread");
+        this.handlerThread.start();
+
+        // An Android service handler is a handler running on a specific background thread.
+        this.serviceHandler = new ServiceHandler(this.handlerThread.getLooper());
 
         if (!RCLJava.isInitialized()) {
             RCLJava.rclJavaInit();
         }
+    }
 
-        if (this.executor == null) {
-            this.executor = new MultiThreadedExecutor();
-            this.executor.spin();
-        }
+    //    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStart");
+        int result = super.onStartCommand(intent, flags, startId);
+
+        this.serviceHandler.sendEmptyMessage(0);
 
         return START_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        this.serviceHandler.sendEmptyMessage(1);
+
         return this.mBinder;
     }
 
     @Override
     public boolean stopService (Intent service) {
-        if (this.executor != null) {
-            this.executor.cancel();
-            this.executor = null;
+        if (RosService.this.executor != null) {
+            RosService.this.executor.cancel();
+            RosService.this.executor = null;
         }
+
         return true;
     }
 
     @Override
     public void onDestroy() {
+        // Cleanup service before destruction
+        this.handlerThread.quit();
+
         if (RCLJava.isInitialized()) {
             RCLJava.shutdown();
         }
 
         super.onDestroy();
+    }
+
+    // Define how the handler will process messages
+    private final class ServiceHandler extends Handler {
+        public ServiceHandler(Looper looper) {
+            super(looper);
+        }
+
+        // Define how to handle any incoming messages here
+        @Override
+        public void handleMessage(Message message) {
+            if (RosService.this.executor == null) {
+                RosService.this.executor = new MultiThreadedExecutor();
+                RosService.this.executor.spin();
+            }
+
+            stopSelf();
+        }
     }
 
     public void addNode(AndroidNode node) {

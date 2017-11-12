@@ -36,7 +36,7 @@ import java.util.concurrent.TimeoutException;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class BaseRosServiceTest {
+public class RosServiceTest {
 
     private Context context;
 
@@ -57,34 +57,34 @@ public class BaseRosServiceTest {
     public void onBind() throws Exception {
     }
 
-    @Test
-    public void testWithBoundService() throws TimeoutException, InterruptedException {
-        // Create the service Intent.
-        Intent serviceIntent = new Intent(this.context, MockRosService.class);
-
-        // Data can be passed to the service via the Intent.
-        //serviceIntent.putExtra(NodeMainExecutorService.SEED_KEY, 42L);
-        this.context.startService(serviceIntent);
-
-        // Bind the service and grab a reference to the binder.
-        IBinder binder = mServiceRule.bindService(serviceIntent);
-
-        // Get the reference to the service, or you can call
-        // public methods on the binder directly.
-        MockRosService serviceExecutor =
-                (MockRosService) ((MockRosService.RosBinder) binder).getService();
-
-        // Verify that the service is working correctly.
-        AndroidNativeNode node = new AndroidNativeNode("_test", this.context);
-        serviceExecutor.addNode(node);
-        //assertThat(service.getRandomInt(), is(any(Integer.class)));
-
-        Thread.sleep(1000);
-
-        serviceExecutor.removeNode(node);
-        this.context.stopService(serviceIntent);
-
-        int i = 0;
-        i += 1;
-    }
+//    @Test
+//    public void testWithBoundService() throws TimeoutException, InterruptedException {
+//        // Create the service Intent.
+//        Intent serviceIntent = new Intent(this.context, MockRosService.class);
+//
+//        // Data can be passed to the service via the Intent.
+//        //serviceIntent.putExtra(NodeMainExecutorService.SEED_KEY, 42L);
+//        this.context.startService(serviceIntent);
+//
+//        // Bind the service and grab a reference to the binder.
+//        IBinder binder = mServiceRule.bindService(serviceIntent);
+//
+//        // Get the reference to the service, or you can call
+//        // public methods on the binder directly.
+//        MockRosService serviceExecutor =
+//                (MockRosService) ((MockRosService.RosBinder) binder).getService();
+//
+//        // Verify that the service is working correctly.
+//        AndroidNativeNode node = new AndroidNativeNode("_test", this.context);
+//        serviceExecutor.addNode(node);
+//        //assertThat(service.getRandomInt(), is(any(Integer.class)));
+//
+//        Thread.sleep(1000);
+//
+//        serviceExecutor.removeNode(node);
+//        this.context.stopService(serviceIntent);
+//
+//        int i = 0;
+//        i += 1;
+//    }
 }

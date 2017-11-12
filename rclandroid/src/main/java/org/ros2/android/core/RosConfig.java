@@ -14,8 +14,6 @@
  */
 package org.ros2.android.core;
 
-import android.app.Activity;
-
-public abstract class BaseRosActivity extends Activity {
-
+public class RosConfig {
+    public static final int CONFIG_TYPE_DEFAULT = 0;
 }

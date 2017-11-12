@@ -23,48 +23,25 @@ import android.util.Log;
 
 import com.google.common.base.Preconditions;
 
-public class BaseRosApplication extends Application {
+import org.ros2.rcljava.RCLJava;
 
-    private BaseRosService service;
+public abstract class BaseRosApplication extends Application {
 
-    private final RosServiceConnection serviceConnection;
-    private final class RosServiceConnection implements ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder binder) {
-            service = ((BaseRosService.RosBinder) binder).getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            service = null;
-        }
-    };
 
     protected BaseRosApplication() {
         super();
-        this.serviceConnection = new RosServiceConnection();
-    }
-
-    public BaseRosService getRosService() {
-        return this.service;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        this.startNodeMainExecutorService();
+        if (!RCLJava.isInitialized()) {
+            RCLJava.rclJavaInit();
+        }
     }
 
     protected void startNodeMainExecutorService() {
-        Log.d("RosApplication", "Start RosService");
-        
-        if (this.service == null) {
-            Intent intent = new Intent(this, BaseRosService.class);
-            this.startService(intent);
-            boolean isBinding = this.bindService(intent, this.serviceConnection, BIND_AUTO_CREATE);
-            Preconditions.checkState(isBinding, "Failed to bind RosService.");
-        }
+
     }
 
     public void restartNodeMainExecutorService() {
@@ -76,11 +53,5 @@ public class BaseRosApplication extends Application {
     
     protected void stopNodeMainExecutorService() {
         Log.d("RosApplication", "Stop NodeMainExecutorService");
-        
-        if (this.service != null) {
-//            this.service.shutdown();
-            this.unbindService(this.serviceConnection);
-            this.service = null;
-        }
     }
 }

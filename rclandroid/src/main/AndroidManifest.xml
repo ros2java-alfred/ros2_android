@@ -3,6 +3,6 @@
       package="org.ros2.android.core">
     <uses-permission android:name="android.permission.INTERNET" />
     <application>
-        <service android:name=".BaseRosService" />
+        <service android:name=".RosService" />
     </application>
 </manifest>
