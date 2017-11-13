@@ -18,6 +18,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.IBinder;
 
 import com.google.common.base.Preconditions;
@@ -25,28 +26,40 @@ import com.google.common.base.Preconditions;
 import org.ros2.android.core.node.AndroidNode;
 import org.ros2.rcljava.exception.NotInitializedException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import static android.content.Context.BIND_AUTO_CREATE;
 
+/**
+ * Ros service manager.
+ */
 public class RosManager {
 
-    private Context context;
+    private final Lock mutex = new ReentrantLock();
+
+    private final Context context;
+
+    // Runnable from client.
+    private final Runnable runOnRosReady;
+
     private RosConfig config;
     private RosService service;
 
-    private class RosServiceConnection implements ServiceConnection {
+    private boolean isBinding = false;
 
-        private Runnable runOnRosReady;
-
-        public RosServiceConnection(Runnable runOnRosReady) {
-            this.runOnRosReady = runOnRosReady;
-        }
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
             RosManager.this.service = ((RosService.RosBinder) binder).getService();
 
-            Thread thread = new Thread(this.runOnRosReady);
-            thread.run();
+            if (RosManager.this.runOnRosReady != null) {
+                Thread thread = new Thread(RosManager.this.runOnRosReady);
+                thread.run();
+            }
         }
 
         @Override
@@ -56,6 +69,7 @@ public class RosManager {
 
         @Override
         public void onBindingDied(ComponentName name) {
+            RosManager.this.service = null;
             throw new NotInitializedException("RSO2 service not binding.");
         }
     };
@@ -63,17 +77,16 @@ public class RosManager {
     /**
      * Constructs an interface to the ROS2 service.
      * Calling this is the first step to enabling an application to use the ROS2 service.
-     * Once ROS2 is ready, if runOnTangoReady is provided, it will be run on a new Thread.
+     * Once ROS2 is ready, if runOnRosReady is provided, it will be run on a new Thread.
      * @param context The Android application context the ROS2 interface should be associated with.
      * @param runOnRosReady
      */
     public RosManager(Context context, Runnable runOnRosReady) {
         this.context = context;
-
-        RosServiceConnection serviceConnection = new RosServiceConnection(runOnRosReady);
+        this.runOnRosReady = runOnRosReady;
 
         Intent intent = new Intent(this.context, RosService.class);
-        boolean isBinding = context.bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+        boolean isBinding = this.context.bindService(intent, this.serviceConnection, BIND_AUTO_CREATE);
         Preconditions.checkState(isBinding, "Failed to bind RosService.");
     }
 
@@ -82,29 +95,28 @@ public class RosManager {
      * @param context The Android application context the ROS2 interface should be associated with.
      */
     @Deprecated
-    public RosManager(Context context) {
-        this(context, null);
-    }
+    public RosManager(Context context) { this(context, null); }
 
     /**
      * Starts the RosService.
      * After calling this function, the service will begin to supply callbacks subscriber/publisher events.
      * The calling application must have internet permissions enabled for connect to be successful.
-     * @param config
+     * @param config Optional RosConfig object. If not null, RosService will lock its configuration to this config.
+
+
      */
     public void connect(RosConfig config) {
-        this.config = config;
+        if (this.mutex.tryLock() && config != null) {
+            this.config = config;
+        }
     }
 
     /**
      * Disconnect a client from the RosService. If a RosConfig was locked, disconnect will also unlock it.
      */
     public void disconnect() {
-        //this.service.shutdown();
-        //this.unbindService(this.serviceConnection);
-        this.service = null;
-        this.config = null;
-        // TODO Unload...
+        this.context.unbindService(this.serviceConnection);
+        this.mutex.unlock();
     }
 
     /**
@@ -118,13 +130,59 @@ public class RosManager {
     public RosConfig getConfig(int configType) {
         RosConfig result = this.config;
 
-        if (configType == RosConfig.CONFIG_TYPE_DEFAULT) {
-            result = new RosConfig();
+        if (this.mutex.tryLock()) {
+            switch (configType) {
+                case RosConfig.CONFIG_TYPE_DEFAULT:
+                    result = new RosConfig();
+                    break;
+                default:
+                    break;
+            }
         }
 
         return result;
     }
 
+    /**
+     * Generates an Intent for requesting ROS permissions. Example usage:
+     * <code>startActivityForResult(RosManager.getRequestPermissionIntent(RosManager.PERMISSIONTYPE_MULTI_EXECUTOR), 42);</code>
+     * @param permissionType The type of permission to request; either PERMISSIONTYPE_MULTI_EXECUTOR or PERMISSIONTYPE_SINGLE_EXECUTOR.
+     * @return Intent An Intent that can be used to request permission.
+     */
+    public static Intent getRequestPermissionIntent(java.lang.String permissionType) {
+        Intent result = new Intent();
+        result.setAction("");
+        return result;
+    }
+
+    /**
+     * Gets the version number for RosService.
+     * Note that this will correctly drop the first two digits of the versionCode since those are used
+     * to identify the Android platform version as per https://developer.android.com/training/multiple-apks/api.html
+     * and are not actually the true version number. For example, "190010362" is for KitKat and "230010362" is for Marshmallow, but the true version number is "10362".
+     * @param context The context of the calling app.
+     * @return The version number of RosService.
+     */
+    public static int getVersion(Context context) {
+        return Build.VERSION.SDK_INT* 10000000  + 10000;
+    }
+
+    /**
+     * Checks if the calling app has the specified permission.
+     * It is recommended that an app check to see if it has a permission before trying to request it;
+     * this will save time by avoiding re-requesting permissions that have already been granted.
+     * @param context The context of the calling app.
+     * @param permissionType The type of permission to request; either PERMISSIONTYPE_MULTI_EXECUTOR or PERMISSIONTYPE_SINGLE_EXECUTOR.
+     * @return True if the permission was already granted; false if otherwise.
+     */
+    public static boolean hasPermission(Context context, java.lang.String permissionType) {
+        return true;
+    }
+
+    /**
+     *
+     * @param node
+     */
     public void addNode(AndroidNode node) {
         if (this.service != null) {
             this.service.addNode(node);
@@ -133,11 +191,27 @@ public class RosManager {
         }
     }
 
+    /**
+     *
+     * @param node
+     */
     public void removeNode(AndroidNode node) {
         if (this.service != null) {
             this.service.removeNode(node);
         } else {
             throw new NotInitializedException("ROS2 service not initialize.");
         }
+    }
+
+    public List<AndroidNode> getNodes() {
+        List<AndroidNode> nodes = new ArrayList<>();
+
+        if (this.service != null) {
+            nodes.addAll(this.service.getNodes());
+        } else {
+            throw new NotInitializedException("ROS2 service not initialize.");
+        }
+
+        return nodes;
     }
 }

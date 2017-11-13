@@ -31,7 +31,7 @@ public abstract class AbstractSensorAdapter<T extends Message> implements Sensor
     protected final AndroidNode node;
     protected volatile Publisher<T> pub;
 
-    protected Object mutex = new Object();
+    protected final Object mutex = new Object();
 
     public AbstractSensorAdapter(final AndroidNode node, final T message, final String topicName) {
         logger.debug("Init Sensor adapter");

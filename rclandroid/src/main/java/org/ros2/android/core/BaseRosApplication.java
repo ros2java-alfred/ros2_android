@@ -15,22 +15,10 @@
 package org.ros2.android.core;
 
 import android.app.Application;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.util.Log;
-
-import com.google.common.base.Preconditions;
 
 import org.ros2.rcljava.RCLJava;
 
 public abstract class BaseRosApplication extends Application {
-
-
-    protected BaseRosApplication() {
-        super();
-    }
 
     @Override
     public void onCreate() {
@@ -38,20 +26,5 @@ public abstract class BaseRosApplication extends Application {
         if (!RCLJava.isInitialized()) {
             RCLJava.rclJavaInit();
         }
-    }
-
-    protected void startNodeMainExecutorService() {
-
-    }
-
-    public void restartNodeMainExecutorService() {
-        Log.d("RosApplication", "Restart NodeMainExecutorService");
-        
-        this.stopNodeMainExecutorService();
-        this.startNodeMainExecutorService();
-    }
-    
-    protected void stopNodeMainExecutorService() {
-        Log.d("RosApplication", "Stop NodeMainExecutorService");
     }
 }

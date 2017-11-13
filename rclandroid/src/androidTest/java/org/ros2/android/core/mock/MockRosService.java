@@ -16,10 +16,6 @@ package org.ros2.android.core.mock;
 
 import org.ros2.android.core.RosService;
 
-/**
- * Created by micky on 7/4/17.
- */
-
 public class MockRosService extends RosService {
 
 }

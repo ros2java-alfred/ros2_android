@@ -35,7 +35,7 @@ import java.util.List;
  * Ros2 on Service.
  */
 public class RosService extends Service {
-    static final String TAG = "RosService";
+    private static final String TAG = "RosService";
 
     /** Binder given to client. */
     private final IBinder mBinder = new RosBinder();
@@ -43,9 +43,11 @@ public class RosService extends Service {
     /** Service Executor */
     private MultiThreadedExecutor executor;
 
+    /** Main Service thread */
     private volatile HandlerThread handlerThread;
     private ServiceHandler serviceHandler;
 
+    /** Binder */
     protected class RosBinder extends Binder {
         public RosService getService() {
             return RosService.this;
