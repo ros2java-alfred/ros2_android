@@ -33,6 +33,7 @@ android {
     compileSdkVersion rootProject.config.version.android.compileSdk
     buildToolsVersion rootProject.config.version.android.buildTool
     defaultConfig {
+        versionCode 1
         minSdkVersion rootProject.config.version.android.minSdk
         targetSdkVersion rootProject.config.version.android.targetSdk
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

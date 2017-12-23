@@ -22,6 +22,12 @@ import org.ros2.android.core.node.AndroidNode;
 
 import sensor_msgs.msg.Illuminance;
 
+/**
+ * Android Light Adapter for ROS2.
+ *
+ * need to add to manifest :
+ * <uses-feature android:name="android.hardware.sensor.light"/>
+ */
 public final class LightSensorAdapter extends AbstractSensorAdapter<Illuminance> {
 
     private volatile float lux = 0f;
@@ -34,6 +40,10 @@ public final class LightSensorAdapter extends AbstractSensorAdapter<Illuminance>
     public void publishSensorState() {
         synchronized (this.mutex) {
             this.msg.setIlluminance(this.lux);
+
+            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setFrameId("light");
+
             logger.debug("Publish light value : " + this.lux);
             System.out.println("Publish light value : " + this.lux);
         }

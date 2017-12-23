@@ -37,6 +37,7 @@ import static android.content.Context.BIND_AUTO_CREATE;
  * Ros service manager.
  */
 public class RosManager {
+    private static final int OS_POSITION = 10000000;
 
     private final Lock mutex = new ReentrantLock();
 
@@ -149,7 +150,7 @@ public class RosManager {
      * @param permissionType The type of permission to request; either PERMISSIONTYPE_MULTI_EXECUTOR or PERMISSIONTYPE_SINGLE_EXECUTOR.
      * @return Intent An Intent that can be used to request permission.
      */
-    public static Intent getRequestPermissionIntent(java.lang.String permissionType) {
+    public static Intent getRequestPermissionIntent(String permissionType) {
         Intent result = new Intent();
         result.setAction("");
         return result;
@@ -164,7 +165,7 @@ public class RosManager {
      * @return The version number of RosService.
      */
     public static int getVersion(Context context) {
-        return Build.VERSION.SDK_INT* 10000000  + 10000;
+        return (Build.VERSION.SDK_INT * OS_POSITION)  + BuildConfig.VERSION_CODE;
     }
 
     /**

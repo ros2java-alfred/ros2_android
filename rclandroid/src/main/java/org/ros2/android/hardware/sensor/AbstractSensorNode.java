@@ -35,25 +35,24 @@ public abstract class AbstractSensorNode<T extends Message> extends AndroidNativ
     private final static String TAG = "AbstractSensorNode";
     private static final Logger logger = LoggerFactory.getLogger(AbstractSensorNode.class);
 
-    private String topicName = "_undefine!";
     private int typeSensor = 0;
+    private final SensorManager sensorManager;
+    private final Sensor sensor;
 
-    private SensorManager sensorManager;
-    private Sensor sensor;
-
-    private WallTimer timer;
+    private final WallTimer timer;
     protected SensorAdapter sensorAdapter;
 
     public AbstractSensorNode(final Context context, final String name, final int typeSensor, final long time, final TimeUnit timeUnit) {
         super(name, context);
-        this.topicName = topicName;
         this.typeSensor = typeSensor;
 
+        // Load sensor
         this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        this.sensor = sensorManager.getDefaultSensor(this.typeSensor);
+        this.sensor = this.sensorManager.getDefaultSensor(this.typeSensor);
 
+        // Register sensor to listener
         this.sensorManager.registerListener(this, this.sensor,
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
         this.timer = this.createWallTimer(time, timeUnit, this);
     }
 

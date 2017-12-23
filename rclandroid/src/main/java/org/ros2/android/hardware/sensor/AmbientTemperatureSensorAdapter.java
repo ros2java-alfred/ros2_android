@@ -22,6 +22,12 @@ import org.ros2.android.core.node.AndroidNode;
 
 import sensor_msgs.msg.Temperature;
 
+/**
+ * Android Barometer Adapter for ROS2.
+ *
+ * need to add to manifest :
+ * <uses-feature android:name="android.hardware.sensor.ambient_temperature"/>
+ */
 public class AmbientTemperatureSensorAdapter extends AbstractSensorAdapter<Temperature> {
 
     private volatile float temperature = 0f;
@@ -33,7 +39,11 @@ public class AmbientTemperatureSensorAdapter extends AbstractSensorAdapter<Tempe
     @Override
     public void publishSensorState() {
         synchronized (this.mutex) {
-            msg.setTemperature(this.temperature);
+            this.msg.setTemperature(this.temperature);
+
+            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setFrameId("temp");
+
             logger.debug("Publish ambient temperature value : " + this.temperature);
             System.out.println("Publish ambient temperature value : " + this.temperature);
         }
@@ -45,6 +55,7 @@ public class AmbientTemperatureSensorAdapter extends AbstractSensorAdapter<Tempe
         if(sensorEvent.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE) {
             synchronized (this.mutex) {
                 this.temperature = sensorEvent.values[0];
+
                 logger.debug("Sensor ambient temperature value : " + this.temperature);
                 System.out.println("Sensor ambient temperature value : " + this.temperature);
             }

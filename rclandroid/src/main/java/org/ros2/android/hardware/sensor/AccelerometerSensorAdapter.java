@@ -25,6 +25,12 @@ import java.util.Collection;
 
 import sensor_msgs.msg.Imu;
 
+/**
+ * Android Accelerometer Adapter for ROS2.
+ *
+ * need to add to manifest :
+ * <uses-feature android:name="android.hardware.sensor.accelerometer"/>
+ */
 public class AccelerometerSensorAdapter extends AbstractSensorAdapter<Imu> {
 
     private volatile Imu imu = new Imu();
@@ -39,6 +45,9 @@ public class AccelerometerSensorAdapter extends AbstractSensorAdapter<Imu> {
         synchronized (this.mutex) {
             this.msg.setLinearAcceleration(this.imu.getLinearAcceleration());
             this.msg.setLinearAccelerationCovariance(this.imu.getLinearAccelerationCovariance());
+
+            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setFrameId("imu");
 
 //            logger.debug("Publish gyro value : " + this.imu);
 //            System.out.println("Publish gyro value : " + this.imu);

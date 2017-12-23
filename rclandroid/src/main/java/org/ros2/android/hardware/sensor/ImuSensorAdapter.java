@@ -30,6 +30,7 @@ public class ImuSensorAdapter implements SensorAdapter<Imu> {
 
     protected AccelerometerSensorAdapter accelAdapter;
     protected GyroscopeSensorAdapter gyroAdapter;
+    protected RotationVectorSensorAdapter rotaAdapter;
 
     protected Imu msg;
     protected String topicName = "_undefine!";//TODO TBD if keep
@@ -47,13 +48,18 @@ public class ImuSensorAdapter implements SensorAdapter<Imu> {
 
         String accelTopic = null;
         String gyroTopic  = null;
+        String rotaTopic  = null;
+
         if (withSubTopics) {
-            accelTopic = topicName + "/accel";
-            gyroTopic  = topicName + "/gyro";
+            accelTopic = this.topicName + "/accel";
+            gyroTopic  = this.topicName + "/gyro";
+            rotaTopic  = this.topicName + "/rotation";
+
         }
 
         this.accelAdapter = new AccelerometerSensorAdapter(this.node, this.msg, accelTopic);
         this.gyroAdapter  = new GyroscopeSensorAdapter(this.node, this.msg, gyroTopic);
+        this.rotaAdapter  = new RotationVectorSensorAdapter(this.node, this.msg, rotaTopic);
     }
 
     @Override
@@ -66,7 +72,14 @@ public class ImuSensorAdapter implements SensorAdapter<Imu> {
             if (this.gyroAdapter != null) {
                 this.gyroAdapter.publishSensorState();
             }
+
+            if (this.rotaAdapter != null) {
+                this.rotaAdapter.publishSensorState();
+            }
         }
+
+        this.msg.getHeader().setStamp(this.node.getCurrentTime());
+        this.msg.getHeader().setFrameId("imu");
 
         this.pub.publish(this.msg);
     }
@@ -81,6 +94,9 @@ public class ImuSensorAdapter implements SensorAdapter<Imu> {
             this.gyroAdapter.onSensorChanged(sensorEvent);
         }
 
+        if (this.rotaAdapter != null && sensorEvent.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            this.rotaAdapter.onSensorChanged(sensorEvent);
+        }
     }
 
     @Override

@@ -22,6 +22,12 @@ import org.ros2.android.core.node.AndroidNode;
 
 import sensor_msgs.msg.FluidPressure;
 
+/**
+ * Android Barometer Adapter for ROS2.
+ *
+ * need to add to manifest :
+ * <uses-feature android:name="android.hardware.sensor.barometer"/>
+ */
 public class BarometerSensorAdapter extends AbstractSensorAdapter<FluidPressure> {
 
     private volatile float pressure = 0f;
@@ -34,6 +40,10 @@ public class BarometerSensorAdapter extends AbstractSensorAdapter<FluidPressure>
     public void publishSensorState() {
         synchronized (this.mutex) {
             this.msg.setFluidPressure(this.pressure);
+
+            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setFrameId("barometer");
+
             logger.debug("Publish Barometer value : " + this.pressure);
             System.out.println("Publish Barometer value : " + this.pressure);
         }
@@ -45,6 +55,7 @@ public class BarometerSensorAdapter extends AbstractSensorAdapter<FluidPressure>
         if(sensorEvent.sensor.getType() == Sensor.TYPE_PRESSURE) {
             synchronized (this.mutex) {
                 this.pressure = sensorEvent.values[0];
+
                 logger.debug("Sensor Barometer value : " + this.pressure);
                 System.out.println("Sensor Barometer value : " + this.pressure);
             }

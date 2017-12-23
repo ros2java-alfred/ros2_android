@@ -25,6 +25,12 @@ import java.util.Collection;
 
 import sensor_msgs.msg.Imu;
 
+/**
+ * Android Gyroscope Adapter for ROS2.
+ *
+ * need to add to manifest :
+ * <uses-feature android:name="android.hardware.sensor.gyroscope"/>
+ */
 public class GyroscopeSensorAdapter extends AbstractSensorAdapter<Imu> {
 
     private volatile Imu imu = new Imu();
@@ -39,6 +45,9 @@ public class GyroscopeSensorAdapter extends AbstractSensorAdapter<Imu> {
         synchronized (this.mutex) {
             this.msg.setAngularVelocity(this.imu.getAngularVelocity());
             this.msg.setAngularVelocityCovariance(this.imu.getAngularVelocityCovariance());
+
+            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setFrameId("imu");
 
 //            logger.debug("Publish gyro value : " + this.imu);
 //            System.out.println("Publish gyro value : " + this.imu);

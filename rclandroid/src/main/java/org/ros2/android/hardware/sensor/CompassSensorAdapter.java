@@ -25,6 +25,12 @@ import java.util.Collection;
 
 import sensor_msgs.msg.MagneticField;
 
+/**
+ * Android Compass Adapter for ROS2.
+ *
+ * need to add to manifest :
+ * <uses-feature android:name="android.hardware.sensor.compass"/>
+ */
 public class CompassSensorAdapter extends AbstractSensorAdapter<MagneticField> {
 
     private MagneticField magneticField = new MagneticField();
@@ -39,6 +45,9 @@ public class CompassSensorAdapter extends AbstractSensorAdapter<MagneticField> {
         synchronized (this.mutex) {
             this.msg.setMagneticField(this.magneticField.getMagneticField());
             this.msg.setMagneticFieldCovariance(this.magneticField.getMagneticFieldCovariance());
+
+            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setFrameId("compass");
 
 //            logger.debug("Publish compass value : " + this.magneticField);
 //            System.out.println("Publish compass value : " + this.magneticField);

@@ -17,6 +17,7 @@ package org.ros2.android.hardware.sensor;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
 
 import org.ros2.android.core.node.AndroidNode;
 
@@ -25,6 +26,12 @@ import java.util.Collection;
 
 import sensor_msgs.msg.Imu;
 
+/**
+ * Android Proximity Adapter for ROS2.
+ *
+ * need to add to manifest :
+ * <uses-feature android:name="android.hardware.sensor.proximity"/>
+ */
 public class RotationVectorSensorAdapter extends AbstractSensorAdapter<Imu> {
 
     private volatile Imu imu = new Imu();
@@ -40,6 +47,9 @@ public class RotationVectorSensorAdapter extends AbstractSensorAdapter<Imu> {
             this.msg.setOrientation(this.imu.getOrientation());
             this.msg.setOrientationCovariance(this.imu.getOrientationCovariance());
 
+            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setFrameId("imu");
+
 //            logger.debug("Publish rotate value : " + this.imu);
 //            System.out.println("Publish rotate value : " + this.imu);
         }
@@ -51,7 +61,7 @@ public class RotationVectorSensorAdapter extends AbstractSensorAdapter<Imu> {
         if(sensorEvent.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             synchronized (this.mutex) {
                 float[] quaternion = new float[4];
-//                SensorManager.getQuaternionFromVector(quaternion, sensorEvent.values);
+                SensorManager.getQuaternionFromVector(quaternion, sensorEvent.values);
                 this.imu.getOrientation().setW(quaternion[0]);
                 this.imu.getOrientation().setX(quaternion[1]);
                 this.imu.getOrientation().setY(quaternion[2]);

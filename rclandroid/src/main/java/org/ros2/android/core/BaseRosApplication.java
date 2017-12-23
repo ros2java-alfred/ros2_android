@@ -18,11 +18,13 @@ import android.app.Application;
 
 import org.ros2.rcljava.RCLJava;
 
+/**  */
 public abstract class BaseRosApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
+
         if (!RCLJava.isInitialized()) {
             RCLJava.rclJavaInit();
         }

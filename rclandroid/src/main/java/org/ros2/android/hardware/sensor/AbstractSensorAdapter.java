@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSensorAdapter<T extends Message> implements SensorAdapter<T> {
 
-    private static final String TAG = "LightSensorAdapter";
+    private static final String TAG = "SensorAdapter";
     protected static final Logger logger = LoggerFactory.getLogger(AbstractSensorAdapter.class);
 
     protected volatile String topicName = "_undefine!";

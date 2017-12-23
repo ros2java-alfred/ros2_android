@@ -22,6 +22,12 @@ import org.ros2.android.core.node.AndroidNode;
 
 import std_msgs.msg.Float32;
 
+/**
+ * Android Proximity Adapter for ROS2.
+ *
+ * need to add to manifest :
+ * <uses-feature android:name="android.hardware.sensor.proximity"/>
+ */
 public class ProximitySensorAdapter extends AbstractSensorAdapter<Float32> {
 
     protected float proximity = 0;
@@ -34,6 +40,7 @@ public class ProximitySensorAdapter extends AbstractSensorAdapter<Float32> {
     public void publishSensorState() {
         synchronized (this.mutex) {
             this.msg.setData(this.proximity);
+
             logger.debug("Publish proximity value : " + this.proximity);
             System.out.println("Publish proximity value : " + this.proximity);
         }
@@ -45,6 +52,7 @@ public class ProximitySensorAdapter extends AbstractSensorAdapter<Float32> {
         if(sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             synchronized (this.mutex) {
                 this.proximity = sensorEvent.values[0];
+
                 logger.debug("Sensor proximity value : " + this.proximity);
                 System.out.println("Sensor proximity value : " + this.proximity);
             }
