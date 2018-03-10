@@ -14,6 +14,34 @@
  */
 package org.ros2.android.core;
 
+/** Ros configuration */
 public class RosConfig {
+
     public static final int CONFIG_TYPE_DEFAULT = 0;
+
+    public static final int CONFIG_TYPE_CONNEXT = 1;
+
+    /** DDS Implementation */
+    private DDSVendor ddsVendor = null;
+
+    protected void setDDSVendor(DDSVendor vendor) {
+        this.ddsVendor = vendor;
+    }
+
+    /** DDS vendor available on Android */
+    public static enum DDSVendor {
+        FAST_RTPS   ("rmw_fastrtps_cpp"),
+        CONNEXT     ("rmw_connext_cpp"),
+        OPENSPLICE  ("rmw_opensplice_cpp");
+
+        private String name;
+
+        DDSVendor(String name) {
+            this.name = name;
+        }
+
+        public String getRmwImplementation() {
+            return this.name;
+        }
+    }
 }

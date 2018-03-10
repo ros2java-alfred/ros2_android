@@ -103,8 +103,6 @@ public class RosManager {
      * After calling this function, the service will begin to supply callbacks subscriber/publisher events.
      * The calling application must have internet permissions enabled for connect to be successful.
      * @param config Optional RosConfig object. If not null, RosService will lock its configuration to this config.
-
-
      */
     public void connect(RosConfig config) {
         if (this.mutex.tryLock() && config != null) {
@@ -135,7 +133,11 @@ public class RosManager {
             switch (configType) {
                 case RosConfig.CONFIG_TYPE_DEFAULT:
                     result = new RosConfig();
+                    result.setDDSVendor(RosConfig.DDSVendor.FAST_RTPS);
                     break;
+                case RosConfig.CONFIG_TYPE_CONNEXT:
+                    result = new RosConfig();
+                    result.setDDSVendor(RosConfig.DDSVendor.CONNEXT);
                 default:
                     break;
             }
@@ -203,6 +205,7 @@ public class RosManager {
             throw new NotInitializedException("ROS2 service not initialize.");
         }
     }
+
 
     public List<AndroidNode> getNodes() {
         List<AndroidNode> nodes = new ArrayList<>();

@@ -27,9 +27,14 @@ public class AndroidNativeNode extends NativeNode implements AndroidNode {
 
 	private final Context context;
 
-	public AndroidNativeNode(String name, Context context) {
+	public AndroidNativeNode(Context context, String name) {
 		super(name);
 		this.context = context;
+	}
+
+	@Deprecated
+	public AndroidNativeNode(String name, Context context) {
+		this(context, name);
 	}
 
 	/**
