@@ -46,7 +46,7 @@ public class AccelerometerSensorAdapter extends AbstractSensorAdapter<Imu> {
             this.msg.setLinearAcceleration(this.imu.getLinearAcceleration());
             this.msg.setLinearAccelerationCovariance(this.imu.getLinearAccelerationCovariance());
 
-            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setStamp(this.node.now());
             this.msg.getHeader().setFrameId("imu");
 
 //            logger.debug("Publish gyro value : " + this.imu);

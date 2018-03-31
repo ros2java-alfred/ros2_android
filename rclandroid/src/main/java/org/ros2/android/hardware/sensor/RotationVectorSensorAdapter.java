@@ -47,7 +47,7 @@ public class RotationVectorSensorAdapter extends AbstractSensorAdapter<Imu> {
             this.msg.setOrientation(this.imu.getOrientation());
             this.msg.setOrientationCovariance(this.imu.getOrientationCovariance());
 
-            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setStamp(this.node.now());
             this.msg.getHeader().setFrameId("imu");
 
 //            logger.debug("Publish rotate value : " + this.imu);

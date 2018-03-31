@@ -46,7 +46,7 @@ public class CompassSensorAdapter extends AbstractSensorAdapter<MagneticField> {
             this.msg.setMagneticField(this.magneticField.getMagneticField());
             this.msg.setMagneticFieldCovariance(this.magneticField.getMagneticFieldCovariance());
 
-            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setStamp(this.node.now());
             this.msg.getHeader().setFrameId("compass");
 
 //            logger.debug("Publish compass value : " + this.magneticField);

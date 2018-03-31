@@ -78,7 +78,7 @@ public class ImuSensorAdapter implements SensorAdapter<Imu> {
             }
         }
 
-        this.msg.getHeader().setStamp(this.node.getCurrentTime());
+        this.msg.getHeader().setStamp(this.node.now());
         this.msg.getHeader().setFrameId("imu");
 
         this.pub.publish(this.msg);

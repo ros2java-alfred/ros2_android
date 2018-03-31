@@ -31,7 +31,7 @@ public class CameraSensorAdapter extends AbstractSensorAdapter<Image> {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        this.cameraInfo.getHeader().setStamp(this.node.getCurrentTime());
+        this.cameraInfo.getHeader().setStamp(this.node.now());
         this.cameraInfo.getHeader().setFrameId("camera");
 
 

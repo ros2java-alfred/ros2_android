@@ -41,7 +41,7 @@ public class AmbientTemperatureSensorAdapter extends AbstractSensorAdapter<Tempe
         synchronized (this.mutex) {
             this.msg.setTemperature(this.temperature);
 
-            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setStamp(this.node.now());
             this.msg.getHeader().setFrameId("temp");
 
             logger.debug("Publish ambient temperature value : " + this.temperature);

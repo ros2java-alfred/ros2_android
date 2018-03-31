@@ -41,7 +41,7 @@ public class BarometerSensorAdapter extends AbstractSensorAdapter<FluidPressure>
         synchronized (this.mutex) {
             this.msg.setFluidPressure(this.pressure);
 
-            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setStamp(this.node.now());
             this.msg.getHeader().setFrameId("barometer");
 
             logger.debug("Publish Barometer value : " + this.pressure);

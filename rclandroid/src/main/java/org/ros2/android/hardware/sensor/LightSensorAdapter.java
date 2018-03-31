@@ -41,7 +41,7 @@ public final class LightSensorAdapter extends AbstractSensorAdapter<Illuminance>
         synchronized (this.mutex) {
             this.msg.setIlluminance(this.lux);
 
-            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setStamp(this.node.now());
             this.msg.getHeader().setFrameId("light");
 
             logger.debug("Publish light value : " + this.lux);

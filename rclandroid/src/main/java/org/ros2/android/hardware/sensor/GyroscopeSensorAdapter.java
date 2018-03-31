@@ -46,7 +46,7 @@ public class GyroscopeSensorAdapter extends AbstractSensorAdapter<Imu> {
             this.msg.setAngularVelocity(this.imu.getAngularVelocity());
             this.msg.setAngularVelocityCovariance(this.imu.getAngularVelocityCovariance());
 
-            this.msg.getHeader().setStamp(this.node.getCurrentTime());
+            this.msg.getHeader().setStamp(this.node.now());
             this.msg.getHeader().setFrameId("imu");
 
 //            logger.debug("Publish gyro value : " + this.imu);
