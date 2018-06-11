@@ -41,6 +41,7 @@ function make_environement_file() {
   env | grep -E '^CI_' >> $HOME_ENV
   echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH" >> $HOME_ENV
   echo -e "PYTHON_PATH=$PYTHON_PATH\nROOT_PATH=$ROOT_PATH" >> $HOME_ENV
+  echo -e "CC=clang\nCXX=clang++" >> $HOME_ENV
 }
 
 ##################################################################
