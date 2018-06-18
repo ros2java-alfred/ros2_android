@@ -59,10 +59,6 @@ cd $ROS2WS
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/617cd893813163cdcb9943a08d667964/raw/ros2_java_android.repos -nv"
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/vcs import src < ros2_java_android.repos"
 
-# Patch for Java support.
-echo "Patch for Java support."
-cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_android.diff
-
 # Sync with git trigger
 rm -rf $ROS2WS/src/ros2_java/ros2_android && ln -s $HOME_BUILD/ros2java-alfred/ros2_android $ROS2WS/src/ros2_java/ros2_android
 
